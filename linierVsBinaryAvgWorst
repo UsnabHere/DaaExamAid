@@ -1,30 +1,28 @@
 
 #include <stdio.h>
 
-int linear(int a[],int n,int key){
-    int i,c=0;
-    for(i=0;i<n;i++){
-        c++;
-        if(a[i]==key) break;
-    }
-    return c;
+int lc,bc;
+
+int linear(int a[],int n,int key,int i){
+    if(i==n) return -1;
+    lc++;
+    if(a[i]==key) return i;
+    return linear(a,n,key,i+1);
 }
 
-int binary(int a[],int n,int key){
-    int l=0,r=n-1,m,c=0;
-    while(l<=r){
-        c++;
-        m=(l+r)/2;
-        if(a[m]==key) break;
-        if(a[m]<key) l=m+1;
-        else r=m-1;
-    }
-    return c;
+int binary(int a[],int l,int r,int key){
+    if(l>r) return -1;
+    int m=(l+r)/2;
+    bc++;
+    if(a[m]==key) return m;
+    if(key<a[m]) return binary(a,l,m-1,key);
+    return binary(a,m+1,r,key);
 }
 
 int main(){
     int a[80],n,i;
     double la,ba;
+
     printf("Size LinAvg BinAvg LinWorst BinWorst\n");
 
     for(n=20;n<=80;n+=10){
@@ -32,43 +30,50 @@ int main(){
 
         la=ba=0;
         for(i=0;i<n;i++){
-            la+=linear(a,n,a[i]);
-            ba+=binary(a,n,a[i]);
+            lc=bc=0;
+            linear(a,n,a[i],0);
+            binary(a,0,n-1,a[i]);
+            la+=lc;
+            ba+=bc;
         }
 
+        lc=bc=0;
+        linear(a,n,-1,0);
+        binary(a,0,n-1,-1);
+
         printf("%d %.2f %.2f %d %d\n",
-            n,la/n,ba/n,
-            linear(a,n,-1),binary(a,n,-1));
+               n,la/n,ba/n,lc,bc);
     }
     return 0;
 }
 
 clc; clear; close all;
 
-n=20:10:80;
+n = 20:10:80;
 
-% Calculated values from C output
-la=[10.5 15.5 20.5 25.5 30.5 35.5 40.5];
-ba=[3.7 4.13 4.58 4.86 5.05 5.29 5.4];
-lw=[20 30 40 50 60 70 80];
-bw=[4 5 5 5 5 6 6];
+% Calculated values from C
+linear_avg = [10.5 15.5 20.5 25.5 30.5 35.5 40.5];
+binary_avg = [3.7 4.13 4.58 4.86 5.05 5.29 5.4];
+
+linear_worst = [20 30 40 50 60 70 80];
+binary_worst = [4 4 5 5 5 6 6];
 
 % Average Case
-subplot(2,1,1);
-plot(n,n,'b--',n,log2(n),'r--', ...
-     n,la,'b-o',n,ba,'r-o','LineWidth',2);
-title('Average Case: Linear vs Binary Search');
-xlabel('Input Size'); ylabel('Comparisons');
-legend('Linear Theory','Binary Theory',...
-       'Linear Calculated','Binary Calculated');
+figure;
+plot(n,linear_avg,'b-o',n,binary_avg,'k-o','LineWidth',2);
+title('Average Case: Linear Search vs Binary Search');
+xlabel('Input Size (n)');
+ylabel('Number of Comparisons');
+legend('Recursive Linear Search','Recursive Binary Search');
 grid on;
 
 % Worst Case
-subplot(2,1,2);
-plot(n,n,'b--',n,log2(n),'r--', ...
-     n,lw,'b-o',n,bw,'r-o','LineWidth',2);
-title('Worst Case: Linear vs Binary Search');
-xlabel('Input Size'); ylabel('Comparisons');
-legend('Linear Theory','Binary Theory',...
-       'Linear Calculated','Binary Calculated');
+figure;
+plot(n,linear_worst,'b-o',n,binary_worst,'k-o','LineWidth',2);
+title('Worst Case: Linear Search vs Binary Search');
+xlabel('Input Size (n)');
+ylabel('Number of Comparisons');
+legend('Recursive Linear Search','Recursive Binary Search');
 grid on;
+
+
