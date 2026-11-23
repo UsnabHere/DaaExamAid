@@ -1,0 +1,76 @@
+
+#include <stdio.h>
+
+int a[80],count;
+
+void quick(int l,int r){
+    if(l>=r) return;
+    int p=a[l],i=l+1,j,t;
+
+    for(j=l+1;j<=r;j++){
+        count++;
+        if(a[j]<p){
+            t=a[i]; a[i]=a[j]; a[j]=t;
+            i++;
+        }
+    }
+    t=a[l]; a[l]=a[i-1]; a[i-1]=t;
+    quick(l,i-2);
+    quick(i,r);
+}
+
+void balanced(int l,int r,int *k){
+    if(l>r) return;
+    int m=(l+r)/2;
+    a[(*k)++]=m;
+    balanced(l,m-1,k);
+    balanced(m+1,r,k);
+}
+
+int main(){
+    int n,i,k,b,w;
+    printf("Size Best Worst\n");
+
+    for(n=20;n<=80;n+=10){
+        k=0;
+        balanced(1,n,&k);
+        count=0;
+        quick(0,n-1);
+        b=count;
+
+        for(i=0;i<n;i++) a[i]=i+1;
+        count=0;
+        quick(0,n-1);
+        w=count;
+
+        printf("%d %d %d\n",n,b,w);
+    }
+    return 0;
+}
+
+
+clc; clear; close all;
+
+n=20:10:80;
+
+% Calculated values from C program
+best_cal=[54 94 133 177 222 268 314];
+worst_cal=[190 435 780 1225 1770 2415 3160];
+
+% Theoretical values
+best_theory=n.*log2(n);
+worst_theory=n.^2;
+
+subplot(2,1,1);
+plot(n,best_theory,'b-o',n,best_cal,'r--*','LineWidth',2);
+title('Quick Sort Best Case');
+xlabel('Input Size'); ylabel('Comparisons');
+legend('Theoretical','Calculated');
+grid on;
+
+subplot(2,1,2);
+plot(n,worst_theory,'b-o',n,worst_cal,'r--*','LineWidth',2);
+title('Quick Sort Worst Case');
+xlabel('Input Size'); ylabel('Comparisons');
+legend('Theoretical','Calculated');
+grid on;
