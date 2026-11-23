@@ -1,0 +1,133 @@
+#include <stdio.h>
+
+typedef struct {
+    double w, p;
+} Item;
+
+Item a[80], temp[80];
+int count;
+
+double log2n(int n) {
+    double x = 0;
+    while(n > 1) {
+        x++;
+        n /= 2;
+    }
+    return x;
+}
+
+void merge(int l, int m, int r) {
+    int i=l, j=m+1, k=l;
+
+    while(i<=m && j<=r) {
+        count++;
+        if(a[i].p/a[i].w >= a[j].p/a[j].w)
+            temp[k++] = a[i++];
+        else
+            temp[k++] = a[j++];
+    }
+
+    while(i<=m) temp[k++] = a[i++];
+    while(j<=r) temp[k++] = a[j++];
+
+    for(i=l;i<=r;i++)
+        a[i] = temp[i];
+}
+
+void sort(int l, int r) {
+    if(l>=r) return;
+
+    int m=(l+r)/2;
+    sort(l,m);
+    sort(m+1,r);
+    merge(l,m,r);
+}
+
+double knapsack(int n, double W) {
+    int i;
+    double profit=0;
+    count=0;
+
+    sort(0,n-1);
+
+    for(i=0;i<n && W>0;i++) {
+        count++;
+
+        if(a[i].w<=W) {
+            profit+=a[i].p;
+            W-=a[i].w;
+        }
+        else {
+            profit+=a[i].p*W/a[i].w;
+            W=0;
+        }
+    }
+    return profit;
+}
+
+int main() {
+    int n,i;
+    double W,profit;
+
+    printf("Enter number of items: ");
+    scanf("%d",&n);
+
+    if(n<1 || n>80) return 0;
+
+    printf("Enter weight and profit:\n");
+    for(i=0;i<n;i++) {
+        scanf("%lf%lf",&a[i].w,&a[i].p);
+        if(a[i].w<=0 || a[i].p<0) return 0;
+    }
+
+    printf("Enter capacity: ");
+    scanf("%lf",&W);
+    if(W<0) return 0;
+
+    profit=knapsack(n,W);
+    printf("\nMaximum Profit = %.2f\n",profit);
+
+    printf("\nSize Theoretical Calculated\n");
+
+    for(n=20;n<=80;n+=10) {
+        for(i=0;i<n;i++) {
+            a[i].w=i%10+1;
+            a[i].p=(i*17)%97+1;
+        }
+
+        knapsack(n,1000);
+
+        printf("%d %.2f %d\n",
+               n,n*log2n(n),count);
+    }
+
+    return 0;
+}
+
+clc; clear; close all;
+
+n = 20:10:80;
+
+% Theoretical Time Complexity
+theory = n .* log2(n);
+
+% Calculated values from C program
+calculated = [80 130 180 230 280 330 380];
+
+% Display Table
+T = table(n',theory',calculated', ...
+    'VariableNames',{'InputSize','Theoretical','Calculated'});
+disp(T);
+
+% Plot Graph
+figure;
+plot(n,theory,'b-o','LineWidth',2);
+hold on;
+plot(n,calculated,'r--*','LineWidth',2);
+
+xlabel('Input Size (n)');
+ylabel('Operation Count');
+title('Fractional Knapsack: Theoretical vs Calculated');
+legend('Theoretical O(n log n)','Calculated','Location','northwest');
+grid on;
+hold off;
