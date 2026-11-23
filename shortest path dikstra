@@ -1,0 +1,78 @@
+
+#include <stdio.h>
+#define INF 99999
+
+int a[80][80],d[80],v[80],n,count;
+
+void dijkstra(int s){
+    int i,j,k,u,min;
+    for(i=0;i<n;i++) d[i]=INF,v[i]=0;
+    d[s]=0; count=0;
+
+    for(k=0;k<n;k++){
+        min=INF; u=-1;
+        for(i=0;i<n;i++){
+            count++;
+            if(!v[i] && d[i]<min)
+                min=d[i],u=i;
+        }
+        if(u==-1) break;
+        v[u]=1;
+
+        for(j=0;j<n;j++){
+            count++;
+            if(!v[j] && a[u][j]>0 &&
+               d[u]+a[u][j]<d[j])
+                d[j]=d[u]+a[u][j];
+        }
+    }
+}
+
+int main(){
+    int i,j,s;
+
+    printf("Enter nodes: ");
+    scanf("%d",&n);
+
+    printf("Enter adjacency matrix:\n");
+    for(i=0;i<n;i++)
+        for(j=0;j<n;j++)
+            scanf("%d",&a[i][j]);
+
+    printf("Enter source: ");
+    scanf("%d",&s);
+
+    dijkstra(s);
+
+    printf("\nNode  Distance\n");
+    for(i=0;i<n;i++)
+        if(d[i]==INF) printf("%d     INF\n",i);
+        else printf("%d     %d\n",i,d[i]);
+
+    printf("\nSize  Theoretical  Calculated\n");
+    for(n=20;n<=80;n+=10){
+        for(i=0;i<n;i++)
+            for(j=0;j<n;j++)
+                a[i][j]=(i==j)?0:1;
+
+        dijkstra(0);
+        printf("%d    %d           %d\n",
+               n,n*n,count);
+    }
+    return 0;
+}
+
+clc; clear; close all;
+
+n = 20:10:80;
+
+theory = [400 900 1600 2500 3600 4900 6400];
+calculated = [800 1800 3200 5000 7200 9800 12800];
+
+plot(n,theory,'b-o',n,calculated,'r--*','LineWidth',2);
+
+title('Dijkstra: Theoretical vs Calculated');
+xlabel('Number of Vertices (V)');
+ylabel('Operation Count');
+legend('Theoretical','Calculated');
+grid on;
