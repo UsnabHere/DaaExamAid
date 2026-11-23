@@ -51,25 +51,19 @@ int main() {
     return 0;
 }
 
+
 clc; clear; close all;
 
 n = 20:10:80;
 
-% Replace with actual C output
-insertion = [110 240 430 660 940 1270 1650];
+% Replace with your actual C output
 merge = [65 110 165 220 280 340 405];
+insertion = [110 240 430 660 940 1270 1650];
 
-% Theoretical complexity
-it = n.^2;
-mt = n.*log2(n);
+plot(n,merge,'b-o',n,insertion,'r-o','LineWidth',2);
 
-plot(n,it,'b--',n,mt,'r--','LineWidth',2);
-hold on;
-plot(n,insertion,'b-o',n,merge,'r-o','LineWidth',2);
-
+title('Average Case: Merge Sort vs Insertion Sort');
 xlabel('Input Size (n)');
-ylabel('Count');
-title('Merge Sort vs Insertion Sort - Average Case');
-legend('Insertion Theoretical','Merge Theoretical',...
-       'Insertion Calculated','Merge Calculated');
+ylabel('Number of Comparisons');
+legend('Merge Sort','Insertion Sort');
 grid on;
